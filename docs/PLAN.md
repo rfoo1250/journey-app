@@ -306,6 +306,6 @@ Crash-resume of `in_progress` trip; unmatched-retry; battery test (1 h drive, no
 - Live map draws the puck from our own fixes, not MapLibre's location component (ADR 8): one location stream, puck always equals what is saved. Source updates throttled to 1 Hz; camera follows at zoom 16 with GPS course, keeping the last good bearing when stationary. Panning disables follow; button recenters.
 - MapLibre platform view cannot render in `flutter_test`; `liveMapBuilderProvider` is overridden with a `SizedBox` in widget tests. Map rendering is verified on device only (§7).
 - Presentation formatting (km, km/h, local date, duration) centralised in `core/widgets/formats.dart`.
-- Device check outstanding: map tiles load, trace line and puck render, follow-cam behaves while walking/driving. Phone was disconnected before this could be observed.
+- 2026-09-17 iPhone: tiles, puck position, follow-off-on-drag and recenter verified. Trace line not yet seen (stationary). First stored trip revealed `duration_s = 0` from a cached pre-Start fix → duration now last fix − first fix. **M3 must drop fixes with `timestamp < startedAt`** (cached last-known position).
 
 _Further notes and measurements go here as milestones complete._

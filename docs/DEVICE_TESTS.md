@@ -49,6 +49,23 @@ Watch fixes in the console: each accepted fix logs one `fix <ts> <lat>,<lon> ±<
 
 ---
 
+## M2 — Live map
+
+### M2-A Map renders (both)
+1. Record screen: map tiles (OpenFreeMap Liberty) visible under the controls.
+2. Start → blue puck at your position within a few seconds; camera zooms to it.
+3. Drag the map → follow switches off (button icon changes); tap the locate button → recenters.
+4. Move ≥ 20 m → a blue line trails the puck.
+5. Stop → trip appears in the list with date, distance, duration.
+
+### M2-B Persistence
+Pull the database and inspect (development builds only):
+```bash
+xcrun devicectl device copy from --device <udid> --domain-type appDataContainer \
+  --domain-identifier com.rfoo1250.journey-app --source Documents/journey.sqlite --destination /tmp/journey.sqlite
+sqlite3 /tmp/journey.sqlite 'select id,status,match_status,distance_m,duration_s from trips; select trip_id,count(*) from trip_points group by 1;'
+```
+
 ## Results
 
 | Date | Device / OS | Test | Result | Notes (fix rate, battery %, oddities) |
@@ -58,3 +75,5 @@ Watch fixes in the console: each accepted fix logs one `fix <ts> <lat>,<lon> ±<
 | 2026-09-17 | iPhone 15 Pro / iOS 26.7 | M1-C step 3 (backgrounded, not killed) | ✅ (partial) | Recording started, app swiped to background: debug console link dropped but the process stayed alive for several minutes. Fix count after reopening not read. 10-min screen-off test skipped by developer. |
 | — | iPhone | M1-A step 6 (services off), M1-D, M1-E | ⏭ | Not run yet. |
 | — | Android | M1-B | ⏭ | Android phone not yet connected. |
+| 2026-09-17 | iPhone 15 Pro / iOS 26.7 | M2-A steps 1–3, 5 | ✅ | Tiles load, puck at correct position, drag disables follow, recenter works. Step 4 (trace line) not yet observed — developer stationary. |
+| 2026-09-17 | iPhone 15 Pro / iOS 26.7 | M2-B | ✅ | DB pulled: 1 trip `complete`/`unmatched`, 2 points, polyline stored. Found `duration_s = 0` → fixed (duration now last fix − first fix; iOS delivered a cached fix 5 s before Start). |
