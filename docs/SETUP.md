@@ -196,7 +196,7 @@ You should get an encoded polyline (precision 6). Also try `/trace_attributes` w
 
 ### 7.4 Reaching Valhalla from your phone during dev
 Your phone can't see `localhost`. Options:
-- Same Wi-Fi: use your Mac's LAN IP (`ipconfig getifaddr en0`) → `http://192.168.x.x:8002`. Android release builds block cleartext HTTP; for dev add `android:usesCleartextTraffic="true"` to the debug manifest only.
+- Same Wi-Fi: use your Mac's LAN IP (`ipconfig getifaddr en0`) → `http://192.168.x.x:8002` in `.env`. Android release builds block cleartext HTTP; the debug manifest sets `android:usesCleartextTraffic="true"`. iOS blocks cleartext too; `Info.plist` sets `NSAppTransportSecurity → NSAllowsLocalNetworking`, which permits plain HTTP to local-network addresses only.
 - Or tunnel: `brew install cloudflared` then `cloudflared tunnel --url http://localhost:8002` gives a public HTTPS URL. Preferred, since it works over mobile data while driving.
 
 ### 7.5 Later: deploy

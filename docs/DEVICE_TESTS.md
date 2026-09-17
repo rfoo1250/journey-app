@@ -66,6 +66,21 @@ xcrun devicectl device copy from --device <udid> --domain-type appDataContainer 
 sqlite3 /tmp/journey.sqlite 'select id,status,match_status,distance_m,duration_s from trips; select trip_id,count(*) from trip_points group by 1;'
 ```
 
+## M3 — Geo pipeline + Valhalla
+
+### M3-A Match on Stop (phone must reach Valhalla: SETUP.md §7.4)
+1. Confirm from the phone's browser that `http://<mac-ip>:8002/status` returns JSON.
+2. Record a real drive (≥ 2 km), Stop.
+   - ✅ Console: `trip … matched: N → M pts, D m` within 30 s.
+   - ✅ Trip list shows the distance; pull the DB (M2-B) and check `match_status = matched`, `matched_polyline6` non-null.
+3. Record the **matched vs raw** delta: `distance_m` vs `Distance.along(raw_polyline6)` (or compare to the odometer). Do this for 3 drives and log them in PLAN.md → Progress → M3.
+
+### M3-B Unmatched path
+1. Turn off Wi-Fi on the phone (or stop the Valhalla container), record a short trip, Stop.
+   - ✅ Console: `trip … not matched (MatchStatus.unmatched)`; list still shows raw distance.
+2. Restore connectivity, kill and relaunch the app.
+   - ✅ Console: the trip is re-processed and becomes `matched`.
+
 ## Results
 
 | Date | Device / OS | Test | Result | Notes (fix rate, battery %, oddities) |

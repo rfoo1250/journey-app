@@ -274,7 +274,7 @@ Crash-resume of `in_progress` trip; unmatched-retry; battery test (1 h drive, no
 - [x] M0 Scaffold — 2026-09-17
 - [~] M1 Location + permissions — code complete 2026-09-17; device tests pending (docs/DEVICE_TESTS.md M1-A…E)
 - [~] M2 Live map — code complete 2026-09-17; on-device map check pending
-- [ ] M3 Geo pipeline + Valhalla
+- [~] M3 Geo pipeline + Valhalla — code complete 2026-09-17; matched-vs-raw deltas on 3 real drives pending
 - [ ] M4 Trip list + detail
 - [ ] M5 Replay animation
 - [ ] M6 Hardening
@@ -307,5 +307,15 @@ Crash-resume of `in_progress` trip; unmatched-retry; battery test (1 h drive, no
 - MapLibre platform view cannot render in `flutter_test`; `liveMapBuilderProvider` is overridden with a `SizedBox` in widget tests. Map rendering is verified on device only (§7).
 - Presentation formatting (km, km/h, local date, duration) centralised in `core/widgets/formats.dart`.
 - 2026-09-17 iPhone: tiles, puck position, follow-off-on-drag and recenter verified. Trace line not yet seen (stationary). First stored trip revealed `duration_s = 0` from a cached pre-Start fix → duration now last fix − first fix. **M3 must drop fixes with `timestamp < startedAt`** (cached last-known position).
+
+### M3 notes (2026-09-17)
+- `core/geo` is plugin-free: a `Fix` value type replaces geolocator's `Position` at the boundary. `Fix.heading` returns null for negative platform values.
+- `GpsFilter` adds a `sessionStart` cutoff (drops iOS's cached pre-Start fix). `Kalman` works in a local east/north frame with per-fix accuracy as R; tested to cut RMSE > 40 % on 8 m noise. `Simplify` maps kept vertices back to their `Fix` so timestamps reach Valhalla; ε is converted to degrees (fine near the equator).
+- `ValhallaClient` sends `time` (epoch s) and `heading` per shape point, `map_snap`, `search_radius 50`, `gps_accuracy` = median fix accuracy. Retries timeouts/connection errors/5xx ×3 with linear backoff; 4xx and parse errors are terminal. dio has no built-in retry interceptor, so the loop lives in the client.
+- `TripProcessor` status mapping: Ok → `matched` (distance along matched line); `NetworkError` → `unmatched` (retried on launch and via `retryUnmatched()`); `InvalidInputError`/`ParseError`/too few fixes → `failed`. Speed stats from filtered raw fixes; avg = distance / moving time (speed > 1 m/s).
+- Stop → `processing` is bounded to 30 s (§4.1). On timeout the trip stays `unmatched`.
+- Testing: mocktail's `captured` list orders named args non-nullable-required first, then nullable, then optional — not call order. Processor tests record `Invocation.namedArguments` instead.
+- Phone → Valhalla: `.env` `VALHALLA_BASE_URL` set to the Mac's LAN IP; iOS needs `NSAllowsLocalNetworking` for cleartext to local addresses.
+- Pending measurement (§5 M3): matched vs raw distance on 3 real drives — record here.
 
 _Further notes and measurements go here as milestones complete._
