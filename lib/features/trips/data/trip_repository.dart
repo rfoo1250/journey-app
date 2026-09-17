@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart' show Value;
+import 'package:geolocator/geolocator.dart' show Position;
 import 'package:journey/core/db/database.dart';
 import 'package:journey/features/trips/domain/trip.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -18,6 +20,69 @@ class TripRepository {
       _db.tripsDao.watchById(id).map((r) => r == null ? null : _toDomain(r));
 
   Future<int> delete(String id) => _db.tripsDao.deleteById(id);
+
+  /// Creates an `in_progress` row when recording starts (PLAN.md §4.1).
+  Future<void> createInProgress({
+    required String id,
+    required DateTime startedAt,
+  }) => _db.tripsDao.upsert(
+    TripsCompanion.insert(
+      id: id,
+      startedAt: startedAt.millisecondsSinceEpoch,
+      status: TripStatus.inProgress,
+      createdAt: DateTime.now().toUtc().millisecondsSinceEpoch,
+    ),
+  );
+
+  /// Appends raw fixes; called every ~10 s / 20 points while recording.
+  Future<void> appendPoints(String tripId, List<Position> fixes) =>
+      _db.tripsDao.addPoints([
+        for (final f in fixes)
+          TripPointsCompanion.insert(
+            tripId: tripId,
+            ts: f.timestamp.millisecondsSinceEpoch,
+            lat: f.latitude,
+            lon: f.longitude,
+            accuracyM: Value(f.accuracy),
+            speedMps: Value(f.speed),
+            headingDeg: Value(f.heading),
+            altitudeM: Value(f.altitude),
+          ),
+      ]);
+
+  /// Marks the trip complete with the raw-trace stats known at Stop.
+  /// Map matching (M3) later fills the matched fields.
+  Future<void> finish({
+    required String id,
+    required DateTime endedAt,
+    required double distanceM,
+    required String rawPolyline6,
+    ({double lat, double lon})? start,
+    ({double lat, double lon})? end,
+  }) async {
+    final row = await _db.tripsDao.getById(id);
+    if (row == null) return;
+    final durationS = (endedAt.millisecondsSinceEpoch - row.startedAt) ~/ 1000;
+    await _db.tripsDao.upsert(
+      row
+          .toCompanion(false)
+          .copyWith(
+            endedAt: Value(endedAt.millisecondsSinceEpoch),
+            status: const Value(TripStatus.complete),
+            matchStatus: const Value(MatchStatus.unmatched),
+            distanceM: Value(distanceM),
+            durationS: Value(durationS),
+            rawPolyline6: Value(rawPolyline6),
+            startLat: Value(start?.lat),
+            startLon: Value(start?.lon),
+            endLat: Value(end?.lat),
+            endLon: Value(end?.lon),
+          ),
+    );
+  }
+
+  Future<List<TripPointRow>> points(String tripId) =>
+      _db.tripsDao.pointsFor(tripId);
 
   static Trip _toDomain(TripRow r) => Trip(
     id: r.id,
