@@ -60,11 +60,11 @@ Scoping is optional, but putting it helps give clear context and shorten the mes
 Using git commit to show header and body
 1. A small commit that fixes a specific bug.
 
-`git commit -m "45 - fix - bug in Monitoring data - showing all rows with scrollbar" -m "{optional body describing the bug and why it is fixed}"`
+`git commit -m "fix - bug in Monitoring data - showing all rows with scrollbar" -m "{optional body describing the bug and why it is fixed}"`
 
 (with scoping)
 
-`git commit -m "45 - fix[Monitoring] - showing all rows with scrollbar" -m "{optional body describing the bug and why it is fixed}"`
+`git commit -m "fix[Monitoring] - showing all rows with scrollbar" -m "{optional body describing the bug and why it is fixed}"`
 
 
 2. A large commit containing a refactor of a portion of a code and documentation
@@ -77,7 +77,7 @@ you should split them into two separate commits
 
 3. A stable commit before merging to `main`
 
-`git commit -m "420 - STABLE - checked and tested Monitoring feature integrity"`
+`git commit -m "STABLE - checked and tested Monitoring feature integrity"`
 
 (pull request and merge commit)
 

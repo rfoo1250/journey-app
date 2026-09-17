@@ -51,7 +51,7 @@ A cross-platform mobile app (iOS + Android, Flutter) that records car drives the
 | Logging | `logger` | No `print` in committed code |
 | Tests | `flutter_test`, `mocktail` | |
 
-Map matching runs **server-side** on a self-hosted Valhalla instance (Docker, see `SETUP.md`). The app talks to it over HTTP; the base URL is configurable.
+Map matching runs **server-side** on a self-hosted Valhalla instance (Docker, see `docs/SETUP.md`). The app talks to it over HTTP; the base URL is configurable.
 
 ## 4. Architecture
 
@@ -265,10 +265,12 @@ Crash-resume of `in_progress` trip; unmatched-retry; battery test (1 h drive, no
 | 3 | 2026-09-15 | Server-side map matching (Valhalla) over client-side | No mature Dart HMM matcher; Valhalla gives road attributes for free later |
 | 4 | 2026-09-15 | No `ACCESS_BACKGROUND_LOCATION` in v1 | User-initiated foreground service suffices; avoids strict Play review |
 | 5 | 2026-09-15 | Local-only storage, no backend | Single user; defers auth/privacy surface |
+| 6 | 2026-09-17 | Domain `Trip` (freezed) separate from drift `TripRow` | Riverpod codegen can't see drift output in the same build phase; also keeps features drift-free |
+| 7 | 2026-09-17 | Commit generated `*.g.dart` / `*.freezed.dart` | Clone-and-run works without a build step; `tool/check.sh` regenerates anyway |
 
 ## 12. Progress
 
-- [ ] M0 Scaffold
+- [x] M0 Scaffold — 2026-09-17
 - [ ] M1 Location + permissions
 - [ ] M2 Live map
 - [ ] M3 Geo pipeline + Valhalla
@@ -276,4 +278,15 @@ Crash-resume of `in_progress` trip; unmatched-retry; battery test (1 h drive, no
 - [ ] M5 Replay animation
 - [ ] M6 Hardening
 
-_Notes and measurements go here as milestones complete._
+### M0 notes (2026-09-17)
+- Toolchain verified: Flutter 3.47.4 / Dart 3.13.3, Xcode 27.0, Android SDK 36 + build-tools 37, Temurin JDK 21, Valhalla 3.8.3 serving the Malaysia extract on :8002.
+- Bundle ID / applicationId: `com.rfoo1250.journey`.
+- Package API changes vs. this doc (§10): `sqlite3_flutter_libs` is end-of-life and a no-op since `sqlite3` 3.x bundles SQLite via Dart hooks — not added. `build_runner` 2.16 removed `--delete-conflicting-outputs`. freezed 4 requires `abstract class`. very_good_analysis 11 enforces the new Dart shorthand constructor syntax (`const new({...})`, `const factory({...})`), applied via `dart fix`.
+- `public_member_api_docs` lint disabled (internal app, not a package).
+- Riverpod and drift generators run in the same build phase, so a `@riverpod` provider cannot reference a drift-generated row type. The freezed domain `Trip` model (§4 `features/trips/domain/trip.dart`) was therefore built in M0; drift rows are `TripRow`/`TripPointRow` and mapped in `TripRepository`.
+- Typed routes are an `AppRoutes` helper class, not `go_router_builder` (not in §3). Propose adding it if route params grow.
+- Widget tests must fake providers (§7) — a real drift stream inside flutter_test's fake-async zone leaves a pending timer and hangs `db.close()`. DB behaviour is covered by `test/core/db/database_test.dart` instead.
+- `tool/check.sh` runs build_runner → format → analyze (fatal infos) → test with a 60 s per-test timeout.
+- Docs moved to `docs/` (PLAN, SETUP, COMMITS); README stays at root.
+
+_Further notes and measurements go here as milestones complete._

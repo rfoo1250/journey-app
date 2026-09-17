@@ -1,6 +1,6 @@
 # SETUP.md — macOS Development Environment
 
-Complete install list for building the driving tracker (Flutter, iOS + Android) with a self-hosted Valhalla map-matching server. Ordered so that each step's prerequisites are already satisfied.
+Complete install list for building **Journey**, a Strava-style drive recorder (Flutter, iOS + Android), with a self-hosted Valhalla map-matching server. Ordered so that each step's prerequisites are already satisfied.
 
 Estimated time: 2–4 hours (most of it is downloads). Disk needed: ~40–60 GB free.
 
@@ -141,7 +141,7 @@ US$25 one-time at https://play.google.com/console. Not needed for local developm
 1. Plug in, trust the computer.
 2. Xcode → Window → Devices and Simulators → confirm it appears.
 3. On the phone: Settings → Privacy & Security → Developer Mode → ON (iOS 16+), then restart.
-4. First `flutter run` will fail on signing; open `ios/Runner.xcworkspace` in Xcode → Runner target → Signing & Capabilities → select your Team and set a unique Bundle Identifier. Subsequent runs work from the CLI.
+4. First `flutter run` will fail on signing; open `ios/Runner.xcworkspace` in Xcode → Runner target → Signing & Capabilities → select your Team and set the Bundle Identifier to `com.rfoo1250.journey-app` (must match Android `applicationId`). Subsequent runs work from the CLI.
 
 Verify: `flutter devices` lists both phones.
 
@@ -162,7 +162,7 @@ Or use Android Studio for everything; Flutter support there is first-class. Pick
 npm install -g @anthropic-ai/claude-code   # requires Node 18+: brew install node
 claude --version
 ```
-Run `claude` inside the project folder; it will pick up `PLAN.md` / `CLAUDE.md`.
+Run `claude` inside the project folder; it will pick up `docs/PLAN.md` / `CLAUDE.md`.
 
 ---
 
@@ -227,14 +227,14 @@ pip install mappymatch osmnx geopandas folium
 
 ## 10. Create the project and smoke-test
 
+The repo already lives at `~/Desktop/Journey` with `docs/PLAN.md`, `docs/SETUP.md` and `docs/COMMITS.md`. Scaffold the Flutter project *into* it (the `.` keeps the existing files):
 ```bash
-mkdir -p ~/dev && cd ~/dev
-flutter create --org com.yourname --platforms ios,android drive_trace
-cd drive_trace
+cd ~/Desktop/Journey
+flutter create --org com.rfoo1250 --project-name journey-app --platforms ios,android .
 flutter run -d <android-device-id>     # from `flutter devices`
 flutter run -d <iphone-device-id>
 ```
-Both should show the counter app. Then drop `PLAN.md` into the repo root and start Claude Code.
+This gives the bundle identifier / Android `applicationId` `com.rfoo1250.journey-app`. Both devices should show the counter app before starting M0.
 
 ---
 
