@@ -280,12 +280,13 @@ Crash-resume of `in_progress` trip; unmatched-retry; battery test (1 h drive, no
 
 ### M0 notes (2026-09-17)
 - Toolchain verified: Flutter 3.47.4 / Dart 3.13.3, Xcode 27.0, Android SDK 36 + build-tools 37, Temurin JDK 21, Valhalla 3.8.3 serving the Malaysia extract on :8002.
-- Bundle ID / applicationId: `com.rfoo1250.journey`.
+- iOS bundle ID `com.rfoo1250.journey-app`; Android applicationId `com.rfoo1250.journey_app` (hyphen illegal on Android). Kotlin namespace stays `com.rfoo1250.journey`.
 - Package API changes vs. this doc (§10): `sqlite3_flutter_libs` is end-of-life and a no-op since `sqlite3` 3.x bundles SQLite via Dart hooks — not added. `build_runner` 2.16 removed `--delete-conflicting-outputs`. freezed 4 requires `abstract class`. very_good_analysis 11 enforces the new Dart shorthand constructor syntax (`const new({...})`, `const factory({...})`), applied via `dart fix`.
 - `public_member_api_docs` lint disabled (internal app, not a package).
 - Riverpod and drift generators run in the same build phase, so a `@riverpod` provider cannot reference a drift-generated row type. The freezed domain `Trip` model (§4 `features/trips/domain/trip.dart`) was therefore built in M0; drift rows are `TripRow`/`TripPointRow` and mapped in `TripRepository`.
 - Typed routes are an `AppRoutes` helper class, not `go_router_builder` (not in §3). Propose adding it if route params grow.
 - Widget tests must fake providers (§7) — a real drift stream inside flutter_test's fake-async zone leaves a pending timer and hangs `db.close()`. DB behaviour is covered by `test/core/db/database_test.dart` instead.
+- Android build: `permission_handler` 14 requires `compileSdk = 37`, and Android 17 renamed platform packages to `android-37.0`/`37.2`. The template's AGP 9.1 cannot resolve that, so AGP → 9.4.0 and Gradle wrapper → 9.6.0. Debug APK and unsigned iOS build both verified.
 - `tool/check.sh` runs build_runner → format → analyze (fatal infos) → test with a 60 s per-test timeout.
 - Docs moved to `docs/` (PLAN, SETUP, COMMITS); README stays at root.
 

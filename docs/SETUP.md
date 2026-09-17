@@ -141,7 +141,7 @@ US$25 one-time at https://play.google.com/console. Not needed for local developm
 1. Plug in, trust the computer.
 2. Xcode → Window → Devices and Simulators → confirm it appears.
 3. On the phone: Settings → Privacy & Security → Developer Mode → ON (iOS 16+), then restart.
-4. First `flutter run` will fail on signing; open `ios/Runner.xcworkspace` in Xcode → Runner target → Signing & Capabilities → select your Team and set the Bundle Identifier to `com.rfoo1250.journey-app` (must match Android `applicationId`). Subsequent runs work from the CLI.
+4. First `flutter run` will fail on signing; open `ios/Runner.xcworkspace` in Xcode → Runner target → Signing & Capabilities → select your Team and confirm the Bundle Identifier is `com.rfoo1250.journey-app` (already set in the project; Android uses `com.rfoo1250.journey_app` because hyphens are illegal there). Subsequent runs work from the CLI.
 
 Verify: `flutter devices` lists both phones.
 
@@ -230,11 +230,11 @@ pip install mappymatch osmnx geopandas folium
 The repo already lives at `~/Desktop/Journey` with `docs/PLAN.md`, `docs/SETUP.md` and `docs/COMMITS.md`. Scaffold the Flutter project *into* it (the `.` keeps the existing files):
 ```bash
 cd ~/Desktop/Journey
-flutter create --org com.rfoo1250 --project-name journey-app --platforms ios,android .
+flutter create --org com.rfoo1250 --project-name journey --platforms ios,android .   # Dart names can't contain '-'
 flutter run -d <android-device-id>     # from `flutter devices`
 flutter run -d <iphone-device-id>
 ```
-This gives the bundle identifier / Android `applicationId` `com.rfoo1250.journey-app`. Both devices should show the counter app before starting M0.
+This generates `com.rfoo1250.journey` on both platforms. The identifiers were then set to `com.rfoo1250.journey-app` (iOS) and `com.rfoo1250.journey_app` (Android) — hyphens are allowed in bundle IDs but not in Android application IDs. They do not need to match. Both devices should show the counter app before starting M0.
 
 ---
 
