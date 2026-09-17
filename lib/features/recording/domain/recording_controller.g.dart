@@ -51,7 +51,7 @@ final class RecordingControllerProvider
 }
 
 String _$recordingControllerHash() =>
-    r'cd6fa9cbcc007e26258782afd6e2587ebd392375';
+    r'083d34c42f845b14fe74516967925b1da581afd7';
 
 /// THE recording state machine (docs/PLAN.md §4.1). Owns the position
 /// subscription. Persistence of fixes arrives in M2; here every accepted fix

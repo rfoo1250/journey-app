@@ -86,7 +86,7 @@ class RecordingController extends _$RecordingController {
     };
     if (startedAt == null) return;
 
-    await _cancel();
+    _cancel();
     state = RecordingState.processing(startedAt: startedAt);
     // TODO(M2): persist trip; TODO(M3): TripProcessor.process(tripId)
     state = const RecordingState.idle();
@@ -109,17 +109,20 @@ class RecordingController extends _$RecordingController {
     state = s.copyWith(fixCount: s.fixCount + 1, lastFix: p);
   }
 
-  Future<void> _onStreamError(Object e, StackTrace st) async {
+  void _onStreamError(Object e, StackTrace st) {
     _log.e('position stream failed', error: e, stackTrace: st);
-    await _cancel();
+    _cancel();
     state = RecordingState.error(
       kind: RecordingErrorKind.streamFailure,
       message: e.toString(),
     );
   }
 
-  Future<void> _cancel() async {
-    await _sub?.cancel();
+  /// Detaches the listener synchronously. The cancel future is not awaited:
+  /// it never resolves under flutter_test's fake async, and geolocator stops
+  /// the platform stream as soon as the listener is gone.
+  void _cancel() {
+    unawaited(_sub?.cancel());
     _sub = null;
   }
 }
