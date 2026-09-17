@@ -15,6 +15,12 @@ class TripsDao extends DatabaseAccessor<AppDatabase> with _$TripsDaoMixin {
   Stream<TripRow?> watchById(String id) =>
       (select(trips)..where((t) => t.id.equals(id))).watchSingleOrNull();
 
+  Future<List<TripRow>> byMatchStatus(MatchStatus status) =>
+      (select(trips)
+            ..where((t) => t.matchStatus.equalsValue(status))
+            ..orderBy([(t) => OrderingTerm.desc(t.startedAt)]))
+          .get();
+
   Future<TripRow?> getById(String id) =>
       (select(trips)..where((t) => t.id.equals(id))).getSingleOrNull();
 

@@ -87,8 +87,55 @@ class TripRepository {
     );
   }
 
+  Future<Trip?> getById(String id) async {
+    final row = await _db.tripsDao.getById(id);
+    return row == null ? null : _toDomain(row);
+  }
+
   Future<List<TripPointRow>> points(String tripId) =>
       _db.tripsDao.pointsFor(tripId);
+
+  /// Trips that still need (or can retry) map matching.
+  Future<List<Trip>> unmatched() async {
+    final rows = await _db.tripsDao.byMatchStatus(MatchStatus.unmatched);
+    return rows.map(_toDomain).toList();
+  }
+
+  /// Writes the geo-pipeline output (docs/PLAN.md §4.2) onto a trip.
+  Future<void> applyProcessing({
+    required String id,
+    required MatchStatus matchStatus,
+    required double distanceM,
+    required int durationS,
+    required int movingS,
+    required double? avgSpeedMps,
+    required double? maxSpeedMps,
+    required String rawPolyline6,
+    required String? matchedPolyline6,
+    ({double lat, double lon})? start,
+    ({double lat, double lon})? end,
+  }) async {
+    final row = await _db.tripsDao.getById(id);
+    if (row == null) return;
+    await _db.tripsDao.upsert(
+      row
+          .toCompanion(false)
+          .copyWith(
+            matchStatus: Value(matchStatus),
+            distanceM: Value(distanceM),
+            durationS: Value(durationS),
+            movingS: Value(movingS),
+            avgSpeedMps: Value(avgSpeedMps),
+            maxSpeedMps: Value(maxSpeedMps),
+            rawPolyline6: Value(rawPolyline6),
+            matchedPolyline6: Value(matchedPolyline6),
+            startLat: Value(start?.lat ?? row.startLat),
+            startLon: Value(start?.lon ?? row.startLon),
+            endLat: Value(end?.lat ?? row.endLat),
+            endLon: Value(end?.lon ?? row.endLon),
+          ),
+    );
+  }
 
   static Trip _toDomain(TripRow r) => Trip(
     id: r.id,
