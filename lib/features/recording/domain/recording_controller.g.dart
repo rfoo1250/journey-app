@@ -1,0 +1,76 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'recording_controller.dart';
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// THE recording state machine (docs/PLAN.md §4.1). Owns the position
+/// subscription. Persistence of fixes arrives in M2; here every accepted fix
+/// is counted and logged.
+
+@ProviderFor(RecordingController)
+final recordingControllerProvider = RecordingControllerProvider._();
+
+/// THE recording state machine (docs/PLAN.md §4.1). Owns the position
+/// subscription. Persistence of fixes arrives in M2; here every accepted fix
+/// is counted and logged.
+final class RecordingControllerProvider
+    extends $NotifierProvider<RecordingController, RecordingState> {
+  /// THE recording state machine (docs/PLAN.md §4.1). Owns the position
+  /// subscription. Persistence of fixes arrives in M2; here every accepted fix
+  /// is counted and logged.
+  RecordingControllerProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'recordingControllerProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$recordingControllerHash();
+
+  @$internal
+  @override
+  RecordingController create() => RecordingController();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(RecordingState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<RecordingState>(value),
+    );
+  }
+}
+
+String _$recordingControllerHash() =>
+    r'cd6fa9cbcc007e26258782afd6e2587ebd392375';
+
+/// THE recording state machine (docs/PLAN.md §4.1). Owns the position
+/// subscription. Persistence of fixes arrives in M2; here every accepted fix
+/// is counted and logged.
+
+abstract class _$RecordingController extends $Notifier<RecordingState> {
+  RecordingState build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<RecordingState, RecordingState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<RecordingState, RecordingState>,
+              RecordingState,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
