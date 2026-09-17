@@ -250,7 +250,7 @@ Crash-resume of `in_progress` trip; unmatched-retry; battery test (1 h drive, no
 ## 10. Working with Claude Code — instructions
 
 - Before each milestone, restate in one paragraph what you'll build and which files you'll touch; wait for a go-ahead only if the plan deviates from this document.
-- Prefer small, reviewable commits. Run `tool/check.sh` before every commit.
+- Prefer small, reviewable commits. Each commit should try to focus on one aspect/feature or housekeeping/documentation. Run `tool/check.sh` before every commit.
 - When a package API differs from what this document assumes (versions move fast), read the package's current README/CHANGELOG on pub.dev, adapt, and note the change in **Progress**.
 - Never add a dependency not listed in §3 without proposing it first with a one-line justification.
 - When you need a real device to verify something (permissions, background behaviour, map rendering), stop and write a precise manual test script for the developer to run, then continue once results are reported.
@@ -271,7 +271,7 @@ Crash-resume of `in_progress` trip; unmatched-retry; battery test (1 h drive, no
 ## 12. Progress
 
 - [x] M0 Scaffold — 2026-09-17
-- [ ] M1 Location + permissions
+- [~] M1 Location + permissions — code complete 2026-09-17; device tests pending (docs/DEVICE_TESTS.md M1-A…E)
 - [ ] M2 Live map
 - [ ] M3 Geo pipeline + Valhalla
 - [ ] M4 Trip list + detail
@@ -289,5 +289,13 @@ Crash-resume of `in_progress` trip; unmatched-retry; battery test (1 h drive, no
 - Android build: `permission_handler` 14 requires `compileSdk = 37`, and Android 17 renamed platform packages to `android-37.0`/`37.2`. The template's AGP 9.1 cannot resolve that, so AGP → 9.4.0 and Gradle wrapper → 9.6.0. Debug APK and unsigned iOS build both verified.
 - `tool/check.sh` runs build_runner → format → analyze (fatal infos) → test with a 60 s per-test timeout.
 - Docs moved to `docs/` (PLAN, SETUP, COMMITS); README stays at root.
+
+### M1 notes (2026-09-17)
+- `minSdk = 24`, not 23 as §4.5 says: geolocator_android, permission_handler_android and the Flutter template all require 24. `targetSdk = 37` (latest stable, Android 17); drop to 36 if the device tests show foreground-service regressions.
+- Android notification permission (`POST_NOTIFICATIONS`) is requested via permission_handler right after location is granted; without it the foreground-service notification is invisible on Android 13+.
+- iOS: `showBackgroundLocationIndicator: true` so the user sees the blue pill while recording with the screen off. `pauseLocationUpdatesAutomatically = false` and `allowBackgroundLocationUpdates = true` are geolocator defaults, asserted in tests.
+- `RecordingController` is `keepAlive` so navigating away from the Record screen never drops the subscription. Pause keeps the subscription (and the Android notification) alive and just ignores fixes.
+- Testing gotchas recorded for later milestones: (1) a `StreamController.close()` future only completes once a listener gets `done` — never await it in tearDown; (2) in `testWidgets`, create stream controllers *inside* the fake-async zone (lazily in the stub) or their cancel futures never resolve under `pump()`.
+- Device verification (foreground notification, 10-min iOS screen-off, denial flows) is scripted in `docs/DEVICE_TESTS.md`; results go in its table and here.
 
 _Further notes and measurements go here as milestones complete._
