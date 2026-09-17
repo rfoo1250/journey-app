@@ -117,3 +117,14 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+# Journey app-specific (PLAN.md §3 Config, §6 Secrets)
+.env
+.env.*
+!.env.example
+# Apps commit their lockfiles (the *.lock rule above is from the Flutter SDK template)
+!pubspec.lock
+!ios/Podfile.lock
+
+# IDE
+.idea/
+*.iml
