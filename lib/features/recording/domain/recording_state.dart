@@ -29,18 +29,27 @@ sealed class RecordingState with _$RecordingState {
   const factory requestingPermission() = RecordingRequestingPermission;
 
   const factory recording({
+    required String tripId,
     required DateTime startedAt,
     @Default(0) int fixCount,
     Position? lastFix,
+    @Default(<({double lat, double lon})>[])
+    List<({double lat, double lon})> trace,
   }) = RecordingActive;
 
   const factory paused({
+    required String tripId,
     required DateTime startedAt,
     @Default(0) int fixCount,
     Position? lastFix,
+    @Default(<({double lat, double lon})>[])
+    List<({double lat, double lon})> trace,
   }) = RecordingPaused;
 
-  const factory processing({required DateTime startedAt}) = RecordingProcessing;
+  const factory processing({
+    required String tripId,
+    required DateTime startedAt,
+  }) = RecordingProcessing;
 
   const factory error({required RecordingErrorKind kind, String? message}) =
       RecordingError;

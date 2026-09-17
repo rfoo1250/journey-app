@@ -9,20 +9,23 @@ part of 'recording_controller.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// THE recording state machine (docs/PLAN.md §4.1). Owns the position
-/// subscription. Persistence of fixes arrives in M2; here every accepted fix
-/// is counted and logged.
+/// subscription, creates the `in_progress` trip, buffers fixes and flushes
+/// them to `trip_points` every [RecordingConfig.flushInterval] or
+/// [RecordingConfig.flushEvery] points, and finalizes the trip on Stop.
 
 @ProviderFor(RecordingController)
 final recordingControllerProvider = RecordingControllerProvider._();
 
 /// THE recording state machine (docs/PLAN.md §4.1). Owns the position
-/// subscription. Persistence of fixes arrives in M2; here every accepted fix
-/// is counted and logged.
+/// subscription, creates the `in_progress` trip, buffers fixes and flushes
+/// them to `trip_points` every [RecordingConfig.flushInterval] or
+/// [RecordingConfig.flushEvery] points, and finalizes the trip on Stop.
 final class RecordingControllerProvider
     extends $NotifierProvider<RecordingController, RecordingState> {
   /// THE recording state machine (docs/PLAN.md §4.1). Owns the position
-  /// subscription. Persistence of fixes arrives in M2; here every accepted fix
-  /// is counted and logged.
+  /// subscription, creates the `in_progress` trip, buffers fixes and flushes
+  /// them to `trip_points` every [RecordingConfig.flushInterval] or
+  /// [RecordingConfig.flushEvery] points, and finalizes the trip on Stop.
   RecordingControllerProvider._()
     : super(
         from: null,
@@ -51,11 +54,12 @@ final class RecordingControllerProvider
 }
 
 String _$recordingControllerHash() =>
-    r'083d34c42f845b14fe74516967925b1da581afd7';
+    r'a5af7a82f8f96d5054eec7ec58d874b5a8a9f49b';
 
 /// THE recording state machine (docs/PLAN.md §4.1). Owns the position
-/// subscription. Persistence of fixes arrives in M2; here every accepted fix
-/// is counted and logged.
+/// subscription, creates the `in_progress` trip, buffers fixes and flushes
+/// them to `trip_points` every [RecordingConfig.flushInterval] or
+/// [RecordingConfig.flushEvery] points, and finalizes the trip on Stop.
 
 abstract class _$RecordingController extends $Notifier<RecordingState> {
   RecordingState build();

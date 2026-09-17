@@ -6,19 +6,45 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:journey/features/recording/data/location_repository.dart';
 import 'package:journey/features/recording/presentation/record_screen.dart';
+import 'package:journey/features/trips/data/trip_repository.dart';
 import 'package:logger/logger.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockLocationRepository extends Mock implements LocationRepository;
 
+class MockTripRepository extends Mock implements TripRepository;
+
 void main() {
   late MockLocationRepository repo;
+  late MockTripRepository trips;
   StreamController<Position>? fixes;
 
-  setUpAll(() => Logger.level = Level.off);
+  setUpAll(() {
+    Logger.level = Level.off;
+    registerFallbackValue(DateTime.utc(2026));
+  });
 
   setUp(() {
     repo = MockLocationRepository();
+    trips = MockTripRepository();
+    when(
+      () => trips.createInProgress(
+        id: any<String>(named: 'id'),
+        startedAt: any<DateTime>(named: 'startedAt'),
+      ),
+    ).thenAnswer((_) async {});
+    when(() => trips.appendPoints(any<String>(), any<List<Position>>()))
+        .thenAnswer((_) async {});
+    when(
+      () => trips.finish(
+        id: any<String>(named: 'id'),
+        endedAt: any<DateTime>(named: 'endedAt'),
+        distanceM: any<double>(named: 'distanceM'),
+        rawPolyline6: any<String>(named: 'rawPolyline6'),
+        start: any<({double lat, double lon})?>(named: 'start'),
+        end: any<({double lat, double lon})?>(named: 'end'),
+      ),
+    ).thenAnswer((_) async {});
     // Created lazily so it lives in the widget test's fake-async zone;
     // otherwise cancel()/close() futures never complete under pump().
     when(repo.positions).thenAnswer((_) {
@@ -36,7 +62,10 @@ void main() {
   });
 
   Widget app() => ProviderScope(
-    overrides: [locationRepositoryProvider.overrideWithValue(repo)],
+    overrides: [
+      locationRepositoryProvider.overrideWithValue(repo),
+      tripRepositoryProvider.overrideWithValue(trips),
+    ],
     child: const MaterialApp(home: RecordScreen()),
   );
 

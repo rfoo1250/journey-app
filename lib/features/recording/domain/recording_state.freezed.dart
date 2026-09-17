@@ -132,14 +132,14 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  idle,TResult Function()?  requestingPermission,TResult Function( DateTime startedAt,  int fixCount,  Position? lastFix)?  recording,TResult Function( DateTime startedAt,  int fixCount,  Position? lastFix)?  paused,TResult Function( DateTime startedAt)?  processing,TResult Function( RecordingErrorKind kind,  String? message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  idle,TResult Function()?  requestingPermission,TResult Function( String tripId,  DateTime startedAt,  int fixCount,  Position? lastFix,  List<({double lat, double lon,})> trace)?  recording,TResult Function( String tripId,  DateTime startedAt,  int fixCount,  Position? lastFix,  List<({double lat, double lon,})> trace)?  paused,TResult Function( String tripId,  DateTime startedAt)?  processing,TResult Function( RecordingErrorKind kind,  String? message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case RecordingIdle() when idle != null:
 return idle();case RecordingRequestingPermission() when requestingPermission != null:
 return requestingPermission();case RecordingActive() when recording != null:
-return recording(_that.startedAt,_that.fixCount,_that.lastFix);case RecordingPaused() when paused != null:
-return paused(_that.startedAt,_that.fixCount,_that.lastFix);case RecordingProcessing() when processing != null:
-return processing(_that.startedAt);case RecordingError() when error != null:
+return recording(_that.tripId,_that.startedAt,_that.fixCount,_that.lastFix,_that.trace);case RecordingPaused() when paused != null:
+return paused(_that.tripId,_that.startedAt,_that.fixCount,_that.lastFix,_that.trace);case RecordingProcessing() when processing != null:
+return processing(_that.tripId,_that.startedAt);case RecordingError() when error != null:
 return error(_that.kind,_that.message);case _:
   return orElse();
 
@@ -158,14 +158,14 @@ return error(_that.kind,_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  idle,required TResult Function()  requestingPermission,required TResult Function( DateTime startedAt,  int fixCount,  Position? lastFix)  recording,required TResult Function( DateTime startedAt,  int fixCount,  Position? lastFix)  paused,required TResult Function( DateTime startedAt)  processing,required TResult Function( RecordingErrorKind kind,  String? message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  idle,required TResult Function()  requestingPermission,required TResult Function( String tripId,  DateTime startedAt,  int fixCount,  Position? lastFix,  List<({double lat, double lon,})> trace)  recording,required TResult Function( String tripId,  DateTime startedAt,  int fixCount,  Position? lastFix,  List<({double lat, double lon,})> trace)  paused,required TResult Function( String tripId,  DateTime startedAt)  processing,required TResult Function( RecordingErrorKind kind,  String? message)  error,}) {final _that = this;
 switch (_that) {
 case RecordingIdle():
 return idle();case RecordingRequestingPermission():
 return requestingPermission();case RecordingActive():
-return recording(_that.startedAt,_that.fixCount,_that.lastFix);case RecordingPaused():
-return paused(_that.startedAt,_that.fixCount,_that.lastFix);case RecordingProcessing():
-return processing(_that.startedAt);case RecordingError():
+return recording(_that.tripId,_that.startedAt,_that.fixCount,_that.lastFix,_that.trace);case RecordingPaused():
+return paused(_that.tripId,_that.startedAt,_that.fixCount,_that.lastFix,_that.trace);case RecordingProcessing():
+return processing(_that.tripId,_that.startedAt);case RecordingError():
 return error(_that.kind,_that.message);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -180,14 +180,14 @@ return error(_that.kind,_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  idle,TResult? Function()?  requestingPermission,TResult? Function( DateTime startedAt,  int fixCount,  Position? lastFix)?  recording,TResult? Function( DateTime startedAt,  int fixCount,  Position? lastFix)?  paused,TResult? Function( DateTime startedAt)?  processing,TResult? Function( RecordingErrorKind kind,  String? message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  idle,TResult? Function()?  requestingPermission,TResult? Function( String tripId,  DateTime startedAt,  int fixCount,  Position? lastFix,  List<({double lat, double lon,})> trace)?  recording,TResult? Function( String tripId,  DateTime startedAt,  int fixCount,  Position? lastFix,  List<({double lat, double lon,})> trace)?  paused,TResult? Function( String tripId,  DateTime startedAt)?  processing,TResult? Function( RecordingErrorKind kind,  String? message)?  error,}) {final _that = this;
 switch (_that) {
 case RecordingIdle() when idle != null:
 return idle();case RecordingRequestingPermission() when requestingPermission != null:
 return requestingPermission();case RecordingActive() when recording != null:
-return recording(_that.startedAt,_that.fixCount,_that.lastFix);case RecordingPaused() when paused != null:
-return paused(_that.startedAt,_that.fixCount,_that.lastFix);case RecordingProcessing() when processing != null:
-return processing(_that.startedAt);case RecordingError() when error != null:
+return recording(_that.tripId,_that.startedAt,_that.fixCount,_that.lastFix,_that.trace);case RecordingPaused() when paused != null:
+return paused(_that.tripId,_that.startedAt,_that.fixCount,_that.lastFix,_that.trace);case RecordingProcessing() when processing != null:
+return processing(_that.tripId,_that.startedAt);case RecordingError() when error != null:
 return error(_that.kind,_that.message);case _:
   return null;
 
@@ -264,12 +264,20 @@ String toString() {
 
 
 class RecordingActive implements RecordingState {
-  const RecordingActive({required this.startedAt, this.fixCount = 0, this.lastFix});
+  const RecordingActive({required this.tripId, required this.startedAt, this.fixCount = 0, this.lastFix,  List<({double lat, double lon,})> trace = const <({double lat, double lon})>[]}): _trace = trace;
   
 
+ final  String tripId;
  final  DateTime startedAt;
 @JsonKey() final  int fixCount;
  final  Position? lastFix;
+ final  List<({double lat, double lon,})> _trace;
+@JsonKey() List<({double lat, double lon,})> get trace {
+  if (_trace is EqualUnmodifiableListView) return _trace;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_trace);
+}
+
 
 /// Create a copy of RecordingState
 /// with the given fields replaced by the non-null parameter values.
@@ -281,18 +289,18 @@ $RecordingActiveCopyWith<RecordingActive> get copyWith => _$RecordingActiveCopyW
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is RecordingActive&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt)&&(identical(other.fixCount, fixCount) || other.fixCount == fixCount)&&(identical(other.lastFix, lastFix) || other.lastFix == lastFix));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is RecordingActive&&(identical(other.tripId, tripId) || other.tripId == tripId)&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt)&&(identical(other.fixCount, fixCount) || other.fixCount == fixCount)&&(identical(other.lastFix, lastFix) || other.lastFix == lastFix)&&const DeepCollectionEquality().equals(other.trace, _trace));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,startedAt,fixCount,lastFix);
+    return Object.hash(runtimeType,tripId,startedAt,fixCount,lastFix,const DeepCollectionEquality().hash(_trace));
 }
 
 @override
 String toString() {
-    return 'RecordingState.recording(startedAt: $startedAt, fixCount: $fixCount, lastFix: $lastFix)';
+    return 'RecordingState.recording(tripId: $tripId, startedAt: $startedAt, fixCount: $fixCount, lastFix: $lastFix, trace: $trace)';
 }
 
 
@@ -303,7 +311,7 @@ abstract mixin class $RecordingActiveCopyWith<$Res> implements $RecordingStateCo
   factory $RecordingActiveCopyWith(RecordingActive value, $Res Function(RecordingActive) _then) = _$RecordingActiveCopyWithImpl;
 @useResult
 $Res call({
- DateTime startedAt, int fixCount, Position? lastFix
+ String tripId, DateTime startedAt, int fixCount, Position? lastFix, List<({double lat, double lon,})> trace
 });
 
 
@@ -320,12 +328,14 @@ class _$RecordingActiveCopyWithImpl<$Res>
 
 /// Create a copy of RecordingState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? startedAt = null,Object? fixCount = null,Object? lastFix = freezed,}) {
+@pragma('vm:prefer-inline') $Res call({Object? tripId = null,Object? startedAt = null,Object? fixCount = null,Object? lastFix = freezed,Object? trace = null,}) {
   return _then(RecordingActive(
-startedAt: null == startedAt ? _self.startedAt : startedAt // ignore: cast_nullable_to_non_nullable
+tripId: null == tripId ? _self.tripId : tripId // ignore: cast_nullable_to_non_nullable
+as String,startedAt: null == startedAt ? _self.startedAt : startedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,fixCount: null == fixCount ? _self.fixCount : fixCount // ignore: cast_nullable_to_non_nullable
 as int,lastFix: freezed == lastFix ? _self.lastFix : lastFix // ignore: cast_nullable_to_non_nullable
-as Position?,
+as Position?,trace: null == trace ? _self._trace : trace // ignore: cast_nullable_to_non_nullable
+as List<({double lat, double lon,})>,
   ));
 }
 
@@ -336,12 +346,20 @@ as Position?,
 
 
 class RecordingPaused implements RecordingState {
-  const RecordingPaused({required this.startedAt, this.fixCount = 0, this.lastFix});
+  const RecordingPaused({required this.tripId, required this.startedAt, this.fixCount = 0, this.lastFix,  List<({double lat, double lon,})> trace = const <({double lat, double lon})>[]}): _trace = trace;
   
 
+ final  String tripId;
  final  DateTime startedAt;
 @JsonKey() final  int fixCount;
  final  Position? lastFix;
+ final  List<({double lat, double lon,})> _trace;
+@JsonKey() List<({double lat, double lon,})> get trace {
+  if (_trace is EqualUnmodifiableListView) return _trace;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_trace);
+}
+
 
 /// Create a copy of RecordingState
 /// with the given fields replaced by the non-null parameter values.
@@ -353,18 +371,18 @@ $RecordingPausedCopyWith<RecordingPaused> get copyWith => _$RecordingPausedCopyW
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is RecordingPaused&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt)&&(identical(other.fixCount, fixCount) || other.fixCount == fixCount)&&(identical(other.lastFix, lastFix) || other.lastFix == lastFix));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is RecordingPaused&&(identical(other.tripId, tripId) || other.tripId == tripId)&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt)&&(identical(other.fixCount, fixCount) || other.fixCount == fixCount)&&(identical(other.lastFix, lastFix) || other.lastFix == lastFix)&&const DeepCollectionEquality().equals(other.trace, _trace));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,startedAt,fixCount,lastFix);
+    return Object.hash(runtimeType,tripId,startedAt,fixCount,lastFix,const DeepCollectionEquality().hash(_trace));
 }
 
 @override
 String toString() {
-    return 'RecordingState.paused(startedAt: $startedAt, fixCount: $fixCount, lastFix: $lastFix)';
+    return 'RecordingState.paused(tripId: $tripId, startedAt: $startedAt, fixCount: $fixCount, lastFix: $lastFix, trace: $trace)';
 }
 
 
@@ -375,7 +393,7 @@ abstract mixin class $RecordingPausedCopyWith<$Res> implements $RecordingStateCo
   factory $RecordingPausedCopyWith(RecordingPaused value, $Res Function(RecordingPaused) _then) = _$RecordingPausedCopyWithImpl;
 @useResult
 $Res call({
- DateTime startedAt, int fixCount, Position? lastFix
+ String tripId, DateTime startedAt, int fixCount, Position? lastFix, List<({double lat, double lon,})> trace
 });
 
 
@@ -392,12 +410,14 @@ class _$RecordingPausedCopyWithImpl<$Res>
 
 /// Create a copy of RecordingState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? startedAt = null,Object? fixCount = null,Object? lastFix = freezed,}) {
+@pragma('vm:prefer-inline') $Res call({Object? tripId = null,Object? startedAt = null,Object? fixCount = null,Object? lastFix = freezed,Object? trace = null,}) {
   return _then(RecordingPaused(
-startedAt: null == startedAt ? _self.startedAt : startedAt // ignore: cast_nullable_to_non_nullable
+tripId: null == tripId ? _self.tripId : tripId // ignore: cast_nullable_to_non_nullable
+as String,startedAt: null == startedAt ? _self.startedAt : startedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,fixCount: null == fixCount ? _self.fixCount : fixCount // ignore: cast_nullable_to_non_nullable
 as int,lastFix: freezed == lastFix ? _self.lastFix : lastFix // ignore: cast_nullable_to_non_nullable
-as Position?,
+as Position?,trace: null == trace ? _self._trace : trace // ignore: cast_nullable_to_non_nullable
+as List<({double lat, double lon,})>,
   ));
 }
 
@@ -408,9 +428,10 @@ as Position?,
 
 
 class RecordingProcessing implements RecordingState {
-  const RecordingProcessing({required this.startedAt});
+  const RecordingProcessing({required this.tripId, required this.startedAt});
   
 
+ final  String tripId;
  final  DateTime startedAt;
 
 /// Create a copy of RecordingState
@@ -423,18 +444,18 @@ $RecordingProcessingCopyWith<RecordingProcessing> get copyWith => _$RecordingPro
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is RecordingProcessing&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is RecordingProcessing&&(identical(other.tripId, tripId) || other.tripId == tripId)&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,startedAt);
+    return Object.hash(runtimeType,tripId,startedAt);
 }
 
 @override
 String toString() {
-    return 'RecordingState.processing(startedAt: $startedAt)';
+    return 'RecordingState.processing(tripId: $tripId, startedAt: $startedAt)';
 }
 
 
@@ -445,7 +466,7 @@ abstract mixin class $RecordingProcessingCopyWith<$Res> implements $RecordingSta
   factory $RecordingProcessingCopyWith(RecordingProcessing value, $Res Function(RecordingProcessing) _then) = _$RecordingProcessingCopyWithImpl;
 @useResult
 $Res call({
- DateTime startedAt
+ String tripId, DateTime startedAt
 });
 
 
@@ -462,9 +483,10 @@ class _$RecordingProcessingCopyWithImpl<$Res>
 
 /// Create a copy of RecordingState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? startedAt = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? tripId = null,Object? startedAt = null,}) {
   return _then(RecordingProcessing(
-startedAt: null == startedAt ? _self.startedAt : startedAt // ignore: cast_nullable_to_non_nullable
+tripId: null == tripId ? _self.tripId : tripId // ignore: cast_nullable_to_non_nullable
+as String,startedAt: null == startedAt ? _self.startedAt : startedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
 }
