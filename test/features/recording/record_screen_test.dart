@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:journey/features/recording/data/location_repository.dart';
 import 'package:journey/features/recording/presentation/record_screen.dart';
+import 'package:journey/features/recording/presentation/widgets/live_map.dart';
 import 'package:journey/features/trips/data/trip_repository.dart';
 import 'package:logger/logger.dart';
 import 'package:mocktail/mocktail.dart';
@@ -65,6 +66,7 @@ void main() {
     overrides: [
       locationRepositoryProvider.overrideWithValue(repo),
       tripRepositoryProvider.overrideWithValue(trips),
+      liveMapBuilderProvider.overrideWithValue((_) => const SizedBox()),
     ],
     child: const MaterialApp(home: RecordScreen()),
   );

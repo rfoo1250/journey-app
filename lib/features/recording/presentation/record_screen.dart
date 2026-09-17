@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:journey/features/recording/data/location_repository.dart';
 import 'package:journey/features/recording/domain/recording_controller.dart';
 import 'package:journey/features/recording/domain/recording_state.dart';
+import 'package:journey/features/recording/presentation/widgets/live_map.dart';
 import 'package:journey/features/recording/presentation/widgets/recording_error_view.dart';
 import 'package:journey/features/recording/presentation/widgets/recording_status_card.dart';
 
-/// Start / Pause / Stop a recording and show live fix stats.
-/// The live map replaces the placeholder in M2.
+/// Live map plus Start / Pause / Stop controls and fix stats.
 class RecordScreen extends ConsumerWidget {
   const new({super.key});
 
@@ -22,8 +22,11 @@ class RecordScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const Expanded(
-              child: Center(child: Icon(Icons.map_outlined, size: 96)),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: ref.watch(liveMapBuilderProvider)(context),
+              ),
             ),
             switch (state) {
               RecordingIdle() => _Controls(
