@@ -267,12 +267,13 @@ Crash-resume of `in_progress` trip; unmatched-retry; battery test (1 h drive, no
 | 5 | 2026-09-15 | Local-only storage, no backend | Single user; defers auth/privacy surface |
 | 6 | 2026-09-17 | Domain `Trip` (freezed) separate from drift `TripRow` | Riverpod codegen can't see drift output in the same build phase; also keeps features drift-free |
 | 7 | 2026-09-17 | Commit generated `*.g.dart` / `*.freezed.dart` | Clone-and-run works without a build step; `tool/check.sh` regenerates anyway |
+| 8 | 2026-09-17 | Puck drawn from recorded fixes, not MapLibre's location component | Single location stream (battery, permissions); puck matches persisted data |
 
 ## 12. Progress
 
 - [x] M0 Scaffold — 2026-09-17
 - [~] M1 Location + permissions — code complete 2026-09-17; device tests pending (docs/DEVICE_TESTS.md M1-A…E)
-- [ ] M2 Live map
+- [~] M2 Live map — code complete 2026-09-17; on-device map check pending
 - [ ] M3 Geo pipeline + Valhalla
 - [ ] M4 Trip list + detail
 - [ ] M5 Replay animation
@@ -298,5 +299,13 @@ Crash-resume of `in_progress` trip; unmatched-retry; battery test (1 h drive, no
 - Testing gotchas recorded for later milestones: (1) a `StreamController.close()` future only completes once a listener gets `done` — never await it in tearDown; (2) in `testWidgets`, create stream controllers *inside* the fake-async zone (lazily in the stub) or their cancel futures never resolve under `pump()`.
 - Device verification (foreground notification, 10-min iOS screen-off, denial flows) is scripted in `docs/DEVICE_TESTS.md`; results go in its table and here.
 - 2026-09-17 iPhone 15 Pro: signed debug build installs and runs; location granted → fixes flow (±4 m indoors, ~1 per 10 s while stationary despite the 5 m filter — iOS emits periodic fixes); pause/resume/stop clean. iOS reports `heading = -1` when stationary — the geo filter (M3) must treat negative heading as unknown. Deny-forever → blocked screen → re-allow → recover verified. Backgrounding keeps the process alive (debug link drops on lock/background — use `flutter attach` to reconnect). Developer skipped the 10-min screen-off test; services-off screen and Android notification still to verify.
+
+### M2 notes (2026-09-17)
+- Trips persist: `in_progress` row on Start, `trip_points` flushed every 10 s / 20 fixes (`RecordingConfig`), `finish()` on Stop with raw distance, precision-6 polyline, endpoints, `match_status = unmatched` for M3. Crash-resume prompt deferred to M6 as planned.
+- `Polyline6` and `Distance` (haversine) pulled forward from M3 because Stop needs them; both pure and unit-tested.
+- Live map draws the puck from our own fixes, not MapLibre's location component (ADR 8): one location stream, puck always equals what is saved. Source updates throttled to 1 Hz; camera follows at zoom 16 with GPS course, keeping the last good bearing when stationary. Panning disables follow; button recenters.
+- MapLibre platform view cannot render in `flutter_test`; `liveMapBuilderProvider` is overridden with a `SizedBox` in widget tests. Map rendering is verified on device only (§7).
+- Presentation formatting (km, km/h, local date, duration) centralised in `core/widgets/formats.dart`.
+- Device check outstanding: map tiles load, trace line and puck render, follow-cam behaves while walking/driving. Phone was disconnected before this could be observed.
 
 _Further notes and measurements go here as milestones complete._
