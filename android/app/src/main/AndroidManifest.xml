@@ -1,6 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Location recording (docs/PLAN.md §4.5). No ACCESS_BACKGROUND_LOCATION in v1:
+         recording is user-initiated and runs in a foreground service. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Valhalla / tiles over HTTP(S) -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="journey"
+        android:label="Journey"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
