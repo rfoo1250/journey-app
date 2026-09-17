@@ -40,6 +40,8 @@ void main() {
       () => trips.finish(
         id: any<String>(named: 'id'),
         endedAt: any<DateTime>(named: 'endedAt'),
+        firstFixAt: any<DateTime?>(named: 'firstFixAt'),
+        lastFixAt: any<DateTime?>(named: 'lastFixAt'),
         distanceM: any<double>(named: 'distanceM'),
         rawPolyline6: any<String>(named: 'rawPolyline6'),
         start: any<({double lat, double lon})?>(named: 'start'),

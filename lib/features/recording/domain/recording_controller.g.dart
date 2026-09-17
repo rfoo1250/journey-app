@@ -54,7 +54,7 @@ final class RecordingControllerProvider
 }
 
 String _$recordingControllerHash() =>
-    r'a5af7a82f8f96d5054eec7ec58d874b5a8a9f49b';
+    r'554039baa277538d45af56ce6a698f9348916f0f';
 
 /// THE recording state machine (docs/PLAN.md §4.1). Owns the position
 /// subscription, creates the `in_progress` trip, buffers fixes and flushes

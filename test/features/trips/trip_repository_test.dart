@@ -59,6 +59,9 @@ void main() {
     await repo.finish(
       id: 't1',
       endedAt: started.add(const Duration(minutes: 12, seconds: 30)),
+      // Cached first fix 5 s before Start must not distort the duration.
+      firstFixAt: started.subtract(const Duration(seconds: 5)),
+      lastFixAt: started.add(const Duration(minutes: 12, seconds: 25)),
       distanceM: 4321,
       rawPolyline6: 'abc',
       start: (lat: 3.1, lon: 101.6),

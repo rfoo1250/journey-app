@@ -21,6 +21,7 @@ part 'recording_controller.g.dart';
 class RecordingController extends _$RecordingController {
   StreamSubscription<Position>? _sub;
   Timer? _flushTimer;
+  DateTime? _firstFixAt;
   final List<Position> _pending = [];
   Future<void> _flushing = Future.value();
   final _log = Logger();
@@ -58,6 +59,7 @@ class RecordingController extends _$RecordingController {
         .createInProgress(id: tripId, startedAt: startedAt);
     _log.i('trip $tripId started');
 
+    _firstFixAt = null;
     state = RecordingState.recording(tripId: tripId, startedAt: startedAt);
     _sub = location.positions().listen(_onFix, onError: _onStreamError);
     _flushTimer = Timer.periodic(
@@ -124,6 +126,8 @@ class RecordingController extends _$RecordingController {
         .finish(
           id: tripId,
           endedAt: lastFix?.timestamp.toUtc() ?? DateTime.now().toUtc(),
+          firstFixAt: _firstFixAt,
+          lastFixAt: lastFix?.timestamp.toUtc(),
           distanceM: Distance.along(trace),
           rawPolyline6: Polyline6.encode(trace),
           start: trace.firstOrNull,
@@ -148,6 +152,7 @@ class RecordingController extends _$RecordingController {
       '±${p.accuracy.toStringAsFixed(1)}m '
       '${p.speed.toStringAsFixed(1)}m/s hdg ${p.heading.toStringAsFixed(0)}',
     );
+    _firstFixAt ??= p.timestamp.toUtc();
     _pending.add(p);
     state = s.copyWith(
       fixCount: s.fixCount + 1,

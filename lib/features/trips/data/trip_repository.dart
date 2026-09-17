@@ -51,18 +51,24 @@ class TripRepository {
       ]);
 
   /// Marks the trip complete with the raw-trace stats known at Stop.
+  /// Duration is last fix − first fix (PLAN.md §4.2), not Stop − Start: iOS
+  /// can deliver a cached first fix stamped before Start was pressed.
   /// Map matching (M3) later fills the matched fields.
   Future<void> finish({
     required String id,
     required DateTime endedAt,
     required double distanceM,
     required String rawPolyline6,
+    DateTime? firstFixAt,
+    DateTime? lastFixAt,
     ({double lat, double lon})? start,
     ({double lat, double lon})? end,
   }) async {
     final row = await _db.tripsDao.getById(id);
     if (row == null) return;
-    final durationS = (endedAt.millisecondsSinceEpoch - row.startedAt) ~/ 1000;
+    final durationS = firstFixAt != null && lastFixAt != null
+        ? lastFixAt.difference(firstFixAt).inSeconds
+        : 0;
     await _db.tripsDao.upsert(
       row
           .toCompanion(false)

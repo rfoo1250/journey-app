@@ -64,6 +64,8 @@ void main() {
       () => trips.finish(
         id: any<String>(named: 'id'),
         endedAt: any<DateTime>(named: 'endedAt'),
+        firstFixAt: any<DateTime?>(named: 'firstFixAt'),
+        lastFixAt: any<DateTime?>(named: 'lastFixAt'),
         distanceM: any<double>(named: 'distanceM'),
         rawPolyline6: any<String>(named: 'rawPolyline6'),
         start: any<({double lat, double lon})?>(named: 'start'),
@@ -242,17 +244,22 @@ void main() {
         () => trips.finish(
           id: id,
           endedAt: captureAny<DateTime>(named: 'endedAt'),
+          firstFixAt: captureAny<DateTime?>(named: 'firstFixAt'),
+          lastFixAt: captureAny<DateTime?>(named: 'lastFixAt'),
           distanceM: captureAny<double>(named: 'distanceM'),
           rawPolyline6: captureAny<String>(named: 'rawPolyline6'),
           start: captureAny<({double lat, double lon})?>(named: 'start'),
           end: captureAny<({double lat, double lon})?>(named: 'end'),
         ),
       ).captured;
-      expect(finish[0], fix(2).timestamp);
-      expect(finish[1] as double, closeTo(111, 2)); // 0.001° lat ≈ 111 m
-      expect(finish[2], isNotEmpty);
-      expect(finish[3], (lat: 3.101, lon: 101.6));
-      expect(finish[4], (lat: 3.102, lon: 101.6));
+      // mocktail captures required named args first, then optional ones.
+      expect(finish[0], fix(2).timestamp); // endedAt
+      expect(finish[1] as double, closeTo(111, 2)); // distanceM, 0.001° lat
+      expect(finish[2], isNotEmpty); // rawPolyline6
+      expect(finish[3], fix(1).timestamp); // firstFixAt
+      expect(finish[4], fix(2).timestamp); // lastFixAt
+      expect(finish[5], (lat: 3.101, lon: 101.6)); // start
+      expect(finish[6], (lat: 3.102, lon: 101.6)); // end
     },
   );
 
@@ -270,6 +277,8 @@ void main() {
       () => trips.finish(
         id: any<String>(named: 'id'),
         endedAt: any<DateTime>(named: 'endedAt'),
+        firstFixAt: any<DateTime?>(named: 'firstFixAt'),
+        lastFixAt: any<DateTime?>(named: 'lastFixAt'),
         distanceM: any<double>(named: 'distanceM'),
         rawPolyline6: any<String>(named: 'rawPolyline6'),
       ),
