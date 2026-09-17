@@ -54,3 +54,7 @@ Watch fixes in the console: each accepted fix logs one `fix <ts> <lat>,<lon> ±<
 | Date | Device / OS | Test | Result | Notes (fix rate, battery %, oddities) |
 |---|---|---|---|---|
 | 2026-09-17 | iPhone 15 Pro / iOS 26.7 | M1-A steps 2–4 (allow path), pause/resume/stop | ✅ | Allowed on first prompt; stationary indoors: 2 fixes in 20 s, ±4 m, speed 0, heading −1 (iOS reports −1 when stationary). Pause → Resume → Stop at ~2 s intervals, no errors, app stayed alive. Deny / deny-forever / services-off screens (steps 3, 5, 6) not yet exercised. |
+| 2026-09-17 | iPhone 15 Pro / iOS 26.7 | M1-A step 5 (deny forever → recover) | ✅ | Settings → Location → Never, Start → console `Location permission denied forever`, blocked screen shown; re-allowed in Settings, Start → fixes resumed within seconds. |
+| 2026-09-17 | iPhone 15 Pro / iOS 26.7 | M1-C step 3 (backgrounded, not killed) | ✅ (partial) | Recording started, app swiped to background: debug console link dropped but the process stayed alive for several minutes. Fix count after reopening not read. 10-min screen-off test skipped by developer. |
+| — | iPhone | M1-A step 6 (services off), M1-D, M1-E | ⏭ | Not run yet. |
+| — | Android | M1-B | ⏭ | Android phone not yet connected. |
