@@ -53,4 +53,4 @@ Watch fixes in the console: each accepted fix logs one `fix <ts> <lat>,<lon> ±<
 
 | Date | Device / OS | Test | Result | Notes (fix rate, battery %, oddities) |
 |---|---|---|---|---|
-| | | | | |
+| 2026-09-17 | iPhone 15 Pro / iOS 26.7 | M1-A steps 2–4 (allow path), pause/resume/stop | ✅ | Allowed on first prompt; stationary indoors: 2 fixes in 20 s, ±4 m, speed 0, heading −1 (iOS reports −1 when stationary). Pause → Resume → Stop at ~2 s intervals, no errors, app stayed alive. Deny / deny-forever / services-off screens (steps 3, 5, 6) not yet exercised. |
