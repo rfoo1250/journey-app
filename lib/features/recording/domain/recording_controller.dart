@@ -7,6 +7,7 @@ import 'package:journey/features/recording/data/location_repository.dart';
 import 'package:journey/features/recording/domain/recording_config.dart';
 import 'package:journey/features/recording/domain/recording_state.dart';
 import 'package:journey/features/trips/data/trip_repository.dart';
+import 'package:journey/features/trips/domain/trip_processor.dart';
 import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -25,6 +26,9 @@ class RecordingController extends _$RecordingController {
   final List<Position> _pending = [];
   Future<void> _flushing = Future.value();
   final _log = Logger();
+
+  /// `processing` must complete or fail within this (docs/PLAN.md §4.1).
+  static const processingBudget = Duration(seconds: 30);
 
   @override
   RecordingState build() {
@@ -134,7 +138,21 @@ class RecordingController extends _$RecordingController {
           end: trace.lastOrNull,
         );
     _log.i('trip $tripId finished: ${trace.length} points');
-    // TODO(M3): TripProcessor.process(tripId)
+
+    // Map-match within the §4.1 budget. On timeout the trip stays
+    // `unmatched` (already persisted by finish) and is retried on next launch.
+    try {
+      await ref
+          .read(tripProcessorProvider)
+          .process(tripId)
+          .timeout(processingBudget);
+    } on TimeoutException {
+      _log.w(
+        'trip $tripId processing exceeded $processingBudget; left unmatched',
+      );
+    } on Object catch (e, st) {
+      _log.e('trip $tripId processing failed', error: e, stackTrace: st);
+    }
     state = const RecordingState.idle();
   }
 

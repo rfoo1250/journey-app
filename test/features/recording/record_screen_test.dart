@@ -4,10 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:journey/core/db/tables.dart' show TripStatus;
+import 'package:journey/core/result.dart';
 import 'package:journey/features/recording/data/location_repository.dart';
 import 'package:journey/features/recording/presentation/record_screen.dart';
 import 'package:journey/features/recording/presentation/widgets/live_map.dart';
 import 'package:journey/features/trips/data/trip_repository.dart';
+import 'package:journey/features/trips/domain/trip.dart';
+import 'package:journey/features/trips/domain/trip_processor.dart';
 import 'package:logger/logger.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -15,9 +19,12 @@ class MockLocationRepository extends Mock implements LocationRepository;
 
 class MockTripRepository extends Mock implements TripRepository;
 
+class MockTripProcessor extends Mock implements TripProcessor;
+
 void main() {
   late MockLocationRepository repo;
   late MockTripRepository trips;
+  late MockTripProcessor processor;
   StreamController<Position>? fixes;
 
   setUpAll(() {
@@ -28,6 +35,17 @@ void main() {
   setUp(() {
     repo = MockLocationRepository();
     trips = MockTripRepository();
+    processor = MockTripProcessor();
+    when(() => processor.process(any<String>())).thenAnswer(
+      (_) async => Result.ok(
+        Trip(
+          id: 'x',
+          startedAt: DateTime.utc(2026),
+          status: TripStatus.complete,
+          createdAt: DateTime.utc(2026),
+        ),
+      ),
+    );
     when(
       () => trips.createInProgress(
         id: any<String>(named: 'id'),
@@ -68,6 +86,7 @@ void main() {
     overrides: [
       locationRepositoryProvider.overrideWithValue(repo),
       tripRepositoryProvider.overrideWithValue(trips),
+      tripProcessorProvider.overrideWithValue(processor),
       liveMapBuilderProvider.overrideWithValue((_) => const SizedBox()),
     ],
     child: const MaterialApp(home: RecordScreen()),

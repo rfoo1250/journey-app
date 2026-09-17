@@ -3,17 +3,23 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:journey/core/db/tables.dart' show TripStatus;
+import 'package:journey/core/result.dart';
 import 'package:journey/features/recording/data/location_repository.dart';
 import 'package:journey/features/recording/domain/recording_config.dart';
 import 'package:journey/features/recording/domain/recording_controller.dart';
 import 'package:journey/features/recording/domain/recording_state.dart';
 import 'package:journey/features/trips/data/trip_repository.dart';
+import 'package:journey/features/trips/domain/trip.dart';
+import 'package:journey/features/trips/domain/trip_processor.dart';
 import 'package:logger/logger.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockLocationRepository extends Mock implements LocationRepository;
 
 class MockTripRepository extends Mock implements TripRepository;
+
+class MockTripProcessor extends Mock implements TripProcessor;
 
 Position fix(int i) => Position(
   latitude: 3.1 + i * 0.001,
@@ -31,6 +37,7 @@ Position fix(int i) => Position(
 void main() {
   late MockLocationRepository location;
   late MockTripRepository trips;
+  late MockTripProcessor processor;
   late StreamController<Position> fixes;
   late ProviderContainer container;
   late List<RecordingState> seen;
@@ -48,6 +55,17 @@ void main() {
   setUp(() {
     location = MockLocationRepository();
     trips = MockTripRepository();
+    processor = MockTripProcessor();
+    when(() => processor.process(any<String>())).thenAnswer(
+      (_) async => Result.ok(
+        Trip(
+          id: 'x',
+          startedAt: DateTime.utc(2026),
+          status: TripStatus.complete,
+          createdAt: DateTime.utc(2026),
+        ),
+      ),
+    );
     fixes = StreamController<Position>();
     when(location.ensurePermission)
         .thenAnswer((_) async => LocationAccess.granted);
@@ -77,6 +95,7 @@ void main() {
       overrides: [
         locationRepositoryProvider.overrideWithValue(location),
         tripRepositoryProvider.overrideWithValue(trips),
+        tripProcessorProvider.overrideWithValue(processor),
         recordingConfigProvider.overrideWithValue(
           const RecordingConfig(
             flushEvery: 3,
@@ -262,6 +281,22 @@ void main() {
       expect(finish[6], (lat: 3.102, lon: 101.6)); // end
     },
   );
+
+  test('stop runs the TripProcessor for the finished trip', () async {
+    await ctrl().start();
+    final id = (state() as RecordingActive).tripId;
+    await ctrl().stop();
+    verify(() => processor.process(id)).called(1);
+    expect(state(), const RecordingState.idle());
+  });
+
+  test('processor failure still returns to idle', () async {
+    when(() => processor.process(any<String>()))
+        .thenThrow(StateError('valhalla exploded'));
+    await ctrl().start();
+    await ctrl().stop();
+    expect(state(), const RecordingState.idle());
+  });
 
   test('stop from paused also works', () async {
     await ctrl().start();
