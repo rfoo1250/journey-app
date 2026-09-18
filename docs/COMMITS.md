@@ -51,7 +51,7 @@ Before coming up with a commit message you should consider:
 
 - STABLE: This commit is tested and run without any problems, used for confirming before a pull request / merge
 
-- (NOT USED) ci: This commits make changes in the CI integration like the files and scripts 
+- ci: This commits make changes in the CI integration like the files and scripts 
 
 ## Scoping
 Scoping is optional, but putting it helps give clear context and shorten the message. Scope would contain the module/file name it focuses on. 
