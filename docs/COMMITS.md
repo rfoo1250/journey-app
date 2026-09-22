@@ -20,7 +20,7 @@ Before coming up with a commit message you should consider:
 
 ## Template
 ```txt
-{type}[optional scope]: {description}
+{type}(optional scope): {description}
 
 [optional body]
 
@@ -54,30 +54,30 @@ Before coming up with a commit message you should consider:
 - ci: This commits make changes in the CI integration like the files and scripts 
 
 ## Scoping
-Scoping is optional, but putting it helps give clear context and shorten the message. Scope would contain the module/file name it focuses on. 
+Scoping is optional, but putting it helps give clear context and shorten the message. Scope would contain the module/file name it focuses on, and goes in parentheses before the colon. 
 
 ## Example
 Using git commit to show header and body
 1. A small commit that fixes a specific bug.
 
-`git commit -m "fix - bug in Monitoring data - showing all rows with scrollbar" -m "{optional body describing the bug and why it is fixed}"`
+`git commit -m "fix: bug in Monitoring data, showing all rows with scrollbar" -m "{optional body describing the bug and why it is fixed}"`
 
 (with scoping)
 
-`git commit -m "fix[Monitoring] - showing all rows with scrollbar" -m "{optional body describing the bug and why it is fixed}"`
+`git commit -m "fix(Monitoring): showing all rows with scrollbar" -m "{optional body describing the bug and why it is fixed}"`
 
 
 2. A large commit containing a refactor of a portion of a code and documentation
 
 you should split them into two separate commits
 
-`git commit -m "68 - chore - refactor code, reduce file sizes, clear comments"`
-`git commit -m "69 - docs - added code changes and structure to doc.md"`
+`git commit -m "68 - chore: refactor code, reduce file sizes, clear comments"`
+`git commit -m "69 - docs: added code changes and structure to doc.md"`
 
 
 3. A stable commit before merging to `main`
 
-`git commit -m "STABLE - checked and tested Monitoring feature integrity"`
+`git commit -m "STABLE: checked and tested Monitoring feature integrity"`
 
 (pull request and merge commit)
 
